@@ -20,8 +20,8 @@ Gebruikte bouwstenen (allemaal breed gebruikt en goed gedocumenteerd):
 - `react-native-svg` voor het poppetje, `react-native-reanimated` voor ademen, knipperen en vloeiende overgangen
 - `@kingstinct/react-native-healthkit` voor Apple Health
 - `react-native-health-connect` voor Android Health Connect
-- `zustand` voor app-state, opslag lokaal op het toestel
-- `expo-secure-store` voor tokens (Keychain op iOS, Keystore op Android)
+- `zustand` met AsyncStorage voor app-state, opslag lokaal op het toestel
+- later voor Strava: `expo-secure-store` voor tokens (Keychain op iOS, Keystore op Android)
 - Jest voor tests, ESLint en TypeScript strict voor codekwaliteit
 - EAS Build, EAS Submit en EAS Update voor bouwen, publiceren en kleine fixes zonder nieuwe store-review
 
@@ -42,9 +42,10 @@ src/
                HealthKit (iOS), Health Connect (Android), Mock, later Strava.
   store/       App-state en lokale opslag: instellingen, waterlog,
                dagscores voor het weekoverzicht.
+    data/        Hooks die bron, opslag en score aan elkaar knopen.
   ui/          Kleuren, typografie, knoppen, spraakwolk, voortgangsbalk.
-app/           Schermen (Expo Router): onboarding, vandaag, week,
-               detail, bronnen, instellingen.
+  app/         Schermen (Expo Router): onboarding, vandaag, week,
+               detail, bronnen, instellingen, speeltuin.
 ```
 
 De scoreformule staat precies zoals in de prompt: per signaal `ratio = clamp(waarde / doel)`, punten = `ratio × gewicht`, totaal 100. Rusthartslag telt omgekeerd (55 bpm of lager is vol, 72 of hoger is nul). Doelen en gewichten staan in één configuratiebestand, zodat ze later instelbaar worden zonder de formule aan te raken.
@@ -107,3 +108,25 @@ De repo krijgt naast deze planning:
 ## 8. Wat ik in deze sessie kan en niet kan
 
 Ik kan alle code schrijven, testen en de app in de browser laten draaien om het hoofdscherm en het poppetje te controleren. Ik kan geen native build op een telefoon draaien en niets in de stores zetten, want daarvoor zijn jouw Apple-, Google- en Expo-accounts nodig. Die stappen staan in `docs/RELEASE.md`, uitgeschreven zodat je ze zelf kunt doen.
+
+## 9. Status
+
+Gekozen op 11 oktober 2026: Expo, Strava later, alle data alleen op het toestel. Er is een Apple Developer-account; een Google Play-account nog niet.
+
+| Fase | Status |
+|---|---|
+| 0 Accounts | Apple klaar. Google Play en Expo nog aanmaken. |
+| 1 Opzet, CI, kernlogica | Klaar. 45 tests. |
+| 2 Poppetje | Klaar, inclusief speeltuin met schuifbalk en expressieblad. |
+| 3 Schermen | Klaar: vandaag, week, detail, bronnen, instellingen, over. |
+| 4 Apple Gezondheid en Health Connect | Code klaar, nog niet getest op een echte telefoon. |
+| 5 Onboarding, lege staten | Klaar. |
+| 6 Store-voorbereiding | Icoon, splash, teksten, privacybeleid en releasegids klaar. Schermafbeeldingen en het online zetten van het privacybeleid nog doen. |
+| 7 Strava, widget, achtergrond | Nog niet begonnen. |
+
+Nog te doen voor de eerste release:
+
+- Development build op een echte iPhone en Android-telefoon, en controleren of alle signalen binnenkomen (docs/RELEASE.md stap 1 en 2).
+- Contactadres invullen in `docs/privacy.html` en het beleid online zetten.
+- Op Android opent Health Connect de app als iemand in het toestemmingsscherm op "privacybeleid" tikt. Google wil dat de app dan het privacybeleid toont. Nu opent het hoofdscherm. Dit moet nog gekoppeld worden aan het scherm Over FitBuddy.
+- Kiezen of de score van vandaag 's ochtends lager mag zijn omdat stappen en water nog oplopen (zie docs/ARCHITECTUUR.md).
