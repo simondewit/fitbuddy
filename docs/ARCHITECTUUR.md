@@ -39,9 +39,11 @@ De regels staan in `src/core/signals.ts` (doelen en gewichten) en `src/core/scor
 
 Herstel (Goed, Prima, Matig, Laag) is het gemiddelde van de ratio's van slaap, HRV en rusthartslag.
 
-### Bekende keuze: de score van vandaag loopt op
+### 's Ochtends begin je op 100
 
-Stappen, workouts, energie en water tellen op over de dag. 's Ochtends is de score dus lager dan 's avonds. Dat is nu bewust zo, omdat het de gebruiker aanspoort. Wil je dat anders, dan is `computeScore` de plek: je kunt bijvoorbeeld het doel van optellende signalen laten meeschalen met het uur van de dag.
+Stappen, workouts, water, actieve energie en mindful minuten tellen op over de dag (`cumulative: true` in `signals.ts`). Voor vandaag groeit hun doel mee met de klok: om 7:00 is het doel nul, om 22:00 het volle doel, daartussen lineair. Wie goed sliep, begint de dag dus op 100. Alleen slaap, HRV en rusthartslag tellen meteen volledig, dus een slechte nacht haalt de score direct omlaag.
+
+De tijden staan als `DAY_START_HOUR` en `DAY_END_HOUR` in `score.ts`; de berekening in `dayProgress`. Eerdere dagen rekenen altijd met het volle doel.
 
 ### Bekende keuze: HRV op iPhone en Android verschilt
 

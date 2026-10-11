@@ -25,17 +25,22 @@ export interface SignalConfig {
    * punten, op of boven `zeroAt` nul punten, daartussen lineair.
    */
   lowerIsBetter?: { zeroAt: number };
+  /**
+   * Telt op over de dag (stappen, water). Vandaag groeit het doel mee met de
+   * klok, zodat je 's ochtends niet al punten mist. Zie dayProgress in score.ts.
+   */
+  cumulative?: boolean;
 }
 
 export const SIGNALS: readonly SignalConfig[] = [
   { key: 'sleep', label: 'Slaap', unit: 'uur', goal: 8, weight: 20 },
-  { key: 'steps', label: 'Stappen', unit: 'stappen', goal: 10000, weight: 15 },
-  { key: 'workout', label: 'Workout', unit: 'min', goal: 30, weight: 15 },
+  { key: 'steps', label: 'Stappen', unit: 'stappen', goal: 10000, weight: 15, cumulative: true },
+  { key: 'workout', label: 'Workout', unit: 'min', goal: 30, weight: 15, cumulative: true },
   { key: 'restingHr', label: 'Rusthartslag', unit: 'bpm', goal: 55, weight: 10, lowerIsBetter: { zeroAt: 72 } },
   { key: 'hrv', label: 'HRV', unit: 'ms', goal: 60, weight: 10 },
-  { key: 'water', label: 'Water', unit: 'L', goal: 2.5, weight: 10 },
-  { key: 'activeEnergy', label: 'Actieve energie', unit: 'kcal', goal: 600, weight: 10 },
-  { key: 'mindful', label: 'Mindful', unit: 'min', goal: 10, weight: 10 },
+  { key: 'water', label: 'Water', unit: 'L', goal: 2.5, weight: 10, cumulative: true },
+  { key: 'activeEnergy', label: 'Actieve energie', unit: 'kcal', goal: 600, weight: 10, cumulative: true },
+  { key: 'mindful', label: 'Mindful', unit: 'min', goal: 10, weight: 10, cumulative: true },
 ];
 
 export const SIGNAL_KEYS: readonly SignalKey[] = SIGNALS.map((s) => s.key);

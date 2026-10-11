@@ -116,7 +116,7 @@ Gekozen op 11 oktober 2026: Expo, Strava later, alle data alleen op het toestel.
 | Fase | Status |
 |---|---|
 | 0 Accounts | Apple klaar. Google Play en Expo nog aanmaken. |
-| 1 Opzet, CI, kernlogica | Klaar. 45 tests. |
+| 1 Opzet, CI, kernlogica | Klaar. 51 tests. 's Ochtends start de score op 100, alleen de nacht telt meteen mee. |
 | 2 Poppetje | Klaar, inclusief speeltuin met schuifbalk en expressieblad. |
 | 3 Schermen | Klaar: vandaag, week, detail, bronnen, instellingen, over. |
 | 4 Apple Gezondheid en Health Connect | Code klaar, nog niet getest op een echte telefoon. |
@@ -129,4 +129,3 @@ Nog te doen voor de eerste release:
 - Development build op een echte iPhone en Android-telefoon, en controleren of alle signalen binnenkomen (docs/RELEASE.md stap 1 en 2).
 - Contactadres invullen in `docs/privacy.html` en het beleid online zetten.
 - Op Android opent Health Connect de app als iemand in het toestemmingsscherm op "privacybeleid" tikt. Google wil dat de app dan het privacybeleid toont. Nu opent het hoofdscherm. Dit moet nog gekoppeld worden aan het scherm Over FitBuddy.
-- Kiezen of de score van vandaag 's ochtends lager mag zijn omdat stappen en water nog oplopen (zie docs/ARCHITECTUUR.md).

@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
-import { computeScore, recoveryLevel, RecoveryLevel, ScoreResult } from '../core/score';
+import { computeScore, dayProgress, recoveryLevel, RecoveryLevel, ScoreResult } from '../core/score';
 import type { DayValues } from '../core/signals';
 import { addDays, dayKey, startOfDay } from '../core/time';
 import { activeSource } from '../health/sources';
@@ -105,7 +105,7 @@ export function useHealthDays(endDate: Date, count = 1): HealthDays {
         const key = dayKey(date);
         const raw = cache[key]?.values ?? {};
         const values = mergeWater(raw, water[key] ?? 0);
-        const result = computeScore(values, { disabled });
+        const result = computeScore(values, { disabled, dayProgress: dayProgress(date) });
         return {
           date,
           key,

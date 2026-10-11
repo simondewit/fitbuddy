@@ -15,6 +15,14 @@ npm run web
 
 De app opent in je browser met demodata. Zo kun je alles bekijken zonder telefoon.
 
+Een testversie als één los HTML-bestand, om te delen of in Chrome te openen:
+
+```sh
+npm run preview
+```
+
+Het bestand komt in `preview/fitbuddy-preview.html`. Open het via een webserver (bijvoorbeeld `npx serve preview`), niet door erop te dubbelklikken.
+
 Op je telefoon kan het ook, met de app Expo Go (gratis in beide stores):
 
 ```sh

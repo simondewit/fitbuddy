@@ -54,6 +54,35 @@ const initial = {
   lastSync: null as number | null,
 };
 
+/**
+ * Opslag die nooit faalt. Lukt lezen of schrijven niet (privévenster,
+ * geblokkeerde opslag, volle schijf), dan start de app met standaardwaarden
+ * in plaats van leeg te blijven.
+ */
+const safeStorage = {
+  getItem: async (name: string) => {
+    try {
+      return await AsyncStorage.getItem(name);
+    } catch {
+      return null;
+    }
+  },
+  setItem: async (name: string, value: string) => {
+    try {
+      await AsyncStorage.setItem(name, value);
+    } catch {
+      // Niet bewaard; de app werkt gewoon verder.
+    }
+  },
+  removeItem: async (name: string) => {
+    try {
+      await AsyncStorage.removeItem(name);
+    } catch {
+      // idem
+    }
+  },
+};
+
 /** Houdt alleen de laatste N dagen, zodat opslag niet blijft groeien. */
 function prune<T>(record: Record<string, T>, keep: number): Record<string, T> {
   const keys = Object.keys(record).sort().slice(-keep);
@@ -86,7 +115,7 @@ export const useSettings = create<SettingsState>()(
     {
       name: 'fitbuddy-settings',
       version: 1,
-      storage: createJSONStorage(() => AsyncStorage),
+      storage: createJSONStorage(() => safeStorage),
     },
   ),
 );

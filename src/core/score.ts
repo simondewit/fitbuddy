@@ -9,6 +9,7 @@ export function signalRatio(config: SignalConfig, value: number): number {
     const { zeroAt } = config.lowerIsBetter;
     return clamp01((zeroAt - value) / (zeroAt - config.goal));
   }
+  // Nog geen doel (vroeg in de ochtend): niets gemist, dus vol.
   if (config.goal <= 0) return 1;
   return clamp01(value / config.goal);
 }
@@ -38,6 +39,29 @@ export interface ScoreOptions {
   disabled?: readonly SignalKey[];
   /** Signalen met afwijkende doelen of gewichten. */
   overrides?: Partial<Record<SignalKey, Partial<Pick<SignalConfig, 'goal' | 'weight'>>>>;
+  /**
+   * Hoe ver de dag gevorderd is, 0..1 (zie dayProgress). Optellende signalen
+   * worden gemeten tegen doel × dayProgress. Standaard 1: het volle doel.
+   */
+  dayProgress?: number;
+}
+
+/** De dag "begint" om 7:00 en het volle doel geldt vanaf 22:00. */
+export const DAY_START_HOUR = 7;
+export const DAY_END_HOUR = 22;
+
+/**
+ * Hoeveel van de dag voorbij is, voor het doel van optellende signalen.
+ * Voor een andere dag dan vandaag altijd 1. Vandaag: 0 tot 7:00, 1 vanaf
+ * 22:00, daartussen lineair. Zo begin je 's ochtends op 100, tenzij je
+ * slecht sliep (slaap, HRV en rusthartslag tellen wel meteen volledig).
+ */
+export function dayProgress(date: Date, now: Date = new Date()): number {
+  const sameDay =
+    date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+  if (!sameDay) return date.getTime() < now.getTime() ? 1 : 0;
+  const hours = now.getHours() + now.getMinutes() / 60;
+  return clamp01((hours - DAY_START_HOUR) / (DAY_END_HOUR - DAY_START_HOUR));
 }
 
 /**
@@ -47,7 +71,11 @@ export interface ScoreOptions {
  */
 export function computeScore(values: DayValues, options: ScoreOptions = {}): ScoreResult {
   const disabled = new Set(options.disabled ?? []);
-  const configs = SIGNALS.map((s) => ({ ...s, ...options.overrides?.[s.key] }));
+  const progress = clamp01(options.dayProgress ?? 1);
+  const configs = SIGNALS.map((s) => {
+    const c = { ...s, ...options.overrides?.[s.key] };
+    return c.cumulative ? { ...c, goal: c.goal * progress } : c;
+  });
 
   const active = configs.filter((c) => {
     const v = values[c.key];

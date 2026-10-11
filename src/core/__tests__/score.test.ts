@@ -1,4 +1,4 @@
-import { computeScore, recoveryLevel, scoreLabel, signalRatio } from '../score';
+import { computeScore, dayProgress, recoveryLevel, scoreLabel, signalRatio } from '../score';
 import { DayValues, SIGNALS, signalConfig } from '../signals';
 
 const FULL: DayValues = {
@@ -131,5 +131,43 @@ describe('recoveryLevel', () => {
   });
   it('null zonder slaap, HRV en rusthartslag', () => {
     expect(recoveryLevel(computeScore({ steps: 5000 }))).toBeNull();
+  });
+});
+
+describe('ochtend begint op 100', () => {
+  const at = (h: number, m = 0) => new Date(2026, 9, 11, h, m);
+
+  it('dayProgress: 0 vóór 7:00, 1 vanaf 22:00, lineair ertussen', () => {
+    const today = at(0);
+    expect(dayProgress(today, at(6))).toBe(0);
+    expect(dayProgress(today, at(7))).toBe(0);
+    expect(dayProgress(today, at(14, 30))).toBeCloseTo(0.5);
+    expect(dayProgress(today, at(22))).toBe(1);
+    expect(dayProgress(today, at(23, 59))).toBe(1);
+  });
+
+  it('dayProgress: eerdere dagen tellen volledig', () => {
+    expect(dayProgress(new Date(2026, 9, 10), at(8))).toBe(1);
+  });
+
+  it('goed geslapen, nog niets gedaan, om 7:00 = 100', () => {
+    const morning = { sleep: 8, steps: 0, workout: 0, restingHr: 54, hrv: 62, water: 0, activeEnergy: 0, mindful: 0 };
+    expect(computeScore(morning, { dayProgress: 0 }).score).toBe(100);
+  });
+
+  it('slecht geslapen haalt de ochtendscore omlaag', () => {
+    const morning = { sleep: 4, steps: 0, workout: 0, restingHr: 68, hrv: 30, water: 0, activeEnergy: 0, mindful: 0 };
+    const r = computeScore(morning, { dayProgress: 0 });
+    expect(r.score).toBeLessThan(80);
+  });
+
+  it('halverwege de dag geldt het halve doel', () => {
+    const r = computeScore({ steps: 5000 }, { dayProgress: 0.5 });
+    expect(r.score).toBe(100);
+    expect(computeScore({ steps: 2500 }, { dayProgress: 0.5 }).score).toBe(50);
+  });
+
+  it('slaap, HRV en rusthartslag schalen niet mee', () => {
+    expect(computeScore({ sleep: 4 }, { dayProgress: 0 }).score).toBe(50);
   });
 });

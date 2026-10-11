@@ -6,7 +6,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { formatGoal, formatSignal, shortDay } from '../../core/format';
-import { signalRatio } from '../../core/score';
+import { dayProgress, signalRatio } from '../../core/score';
 import { SIGNAL_KEYS, SignalKey, signalConfig } from '../../core/signals';
 import { useHealthDays } from '../../data/useHealthDays';
 import { useSelection } from '../../store/selection';
@@ -38,6 +38,8 @@ export default function Detail() {
   const disabled = useSettings((s) => s.disabledSignals.includes(key));
 
   const values = days.map((d) => d.values[key] ?? null);
+  // Optellende signalen: vandaag groeit het doel mee met de klok.
+  const progress = dayProgress(today.date);
   const showRecovery = key === 'hrv' || key === 'restingHr' || key === 'sleep';
 
   return (
@@ -51,6 +53,7 @@ export default function Detail() {
         <Text style={[type.score, { fontSize: 56, lineHeight: 62, letterSpacing: -2 }]}>{formatSignal(key, part.value)}</Text>
         <Text style={type.caption}>
           Doel {formatGoal(key, config.goal)}
+          {config.cumulative && progress < 1 ? ` · nu ${formatGoal(key, config.goal * progress)}` : ''}
           {part.ratio !== null ? ` · ${Math.round(part.points)} van ${Math.round(part.maxPoints)} punten` : ''}
         </Text>
         {disabled && <Text style={type.caption}>Dit signaal staat uit in Instellingen.</Text>}
